@@ -1,13 +1,13 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/login/page": "app/login/page.js",
-  "/api/story/continue/route": "app/api/story/continue/route.js",
-  "/mypage/page": "app/mypage/page.js",
   "/privacy/page": "app/privacy/page.js",
+  "/api/story/continue/route": "app/api/story/continue/route.js",
   "/page": "app/page.js",
-  "/signup/page": "app/signup/page.js",
+  "/mypage/page": "app/mypage/page.js",
   "/terms/page": "app/terms/page.js",
+  "/signup/page": "app/signup/page.js",
   "/admin/page": "app/admin/page.js",
-  "/stories/[id]/page": "app/stories/[id]/page.js",
-  "/stories/page": "app/stories/page.js"
+  "/stories/page": "app/stories/page.js",
+  "/stories/[id]/page": "app/stories/[id]/page.js"
 }

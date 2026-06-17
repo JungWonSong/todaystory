@@ -210,7 +210,7 @@ export default function StoryPlayPage() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [story, setStory] = useState<Story | null>(null);
   const [storyLoading, setStoryLoading] = useState(true);
   const [started, setStarted] = useState(false);
@@ -225,77 +225,159 @@ export default function StoryPlayPage() {
   const [saveError, setSaveError] = useState("");
   const viewedStoryRef = useRef<string | null>(null);
 
-  const urlSessionId = searchParams.get("session");
-  const urlRoute = searchParams.get("route");
+  const storyId = params?.id;
+  const sessionIdParam = searchParams.get("session");
+  const routeParam = searchParams.get("route");
+  const safeRouteFromUrl = isRoute(routeParam) ? routeParam : null;
   const routeToUse = selectedRoute || defaultRoute;
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.replace("/login");
     }
-  }, [loading, router, user]);
+  }, [authLoading, router, user]);
 
   useEffect(() => {
-    if (!user || !params.id) return;
+    if (authLoading) return;
 
-    let mounted = true;
-    const userId = user.id;
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
-    async function loadStoryAndSession() {
+    if (!storyId) return;
+
+    let alive = true;
+
+    async function loadStory() {
       setStoryLoading(true);
+      setError("");
+      setSaveError("");
+      setStory(null);
+      setMessages([]);
+      setSessionId(null);
+      setStarted(false);
+
+      try {
+        const loadedStory = await getStoryById(storyId);
+        if (!alive) return;
+
+        if (!loadedStory) {
+          setStory(null);
+          setError("열 수 없는 장면이에요.");
+          return;
+        }
+
+        setStory(loadedStory);
+      } catch (error) {
+        console.error("load story failed:", error);
+        if (!alive) return;
+        setStory(null);
+        setError("장면을 불러오지 못했어요.");
+      } finally {
+        if (alive) setStoryLoading(false);
+      }
+    }
+
+    void loadStory();
+
+    return () => {
+      alive = false;
+    };
+  }, [authLoading, router, storyId, user]);
+
+  useEffect(() => {
+    setSelectedRoute(safeRouteFromUrl);
+  }, [safeRouteFromUrl, storyId]);
+
+  useEffect(() => {
+    if (!sessionIdParam) {
+      setMessages([]);
+      setSessionId(null);
+      setStarted(false);
+      return;
+    }
+
+    if (!user || !story || storyLoading) return;
+
+    let alive = true;
+    const currentSessionId = sessionIdParam;
+    const currentUserId = user.id;
+    const currentStory = story;
+
+    async function loadSession() {
       setError("");
       setSaveError("");
 
       try {
-        const storyData = await getStoryById(params.id);
-        if (!mounted) return;
-        setStory(storyData);
+        const session = await getStorySessionById(
+          currentSessionId,
+          currentUserId,
+        );
+        const savedPieces = await getStoryMessages(
+          currentSessionId,
+          currentUserId,
+        );
 
-        if (!storyData) return;
+        if (!alive) return;
 
-        if (urlSessionId) {
-          const session = await getStorySessionById(urlSessionId, userId);
-          const savedPieces = await getStoryMessages(urlSessionId, userId);
-
-          if (!mounted) return;
-
-          if (session.story_id !== storyData.id) {
-            setError("이 이야기와 연결된 장면을 찾지 못했어요.");
-            return;
-          }
-
-          const restoredRoute =
-            session.route ?? (isRoute(urlRoute) ? urlRoute : defaultRoute);
-
-          setSessionId(session.id);
-          setSelectedRoute(restoredRoute);
-          setMessages(toSceneMessages(savedPieces));
-          setStarted(savedPieces.length > 0);
-        } else {
+        if (session.story_id !== currentStory.id) {
+          setError("이 이야기와 연결된 장면을 찾지 못했어요.");
           setSessionId(null);
           setMessages([]);
           setStarted(false);
-          setSelectedRoute(isRoute(urlRoute) ? urlRoute : defaultRoute);
+          return;
         }
+
+        setSessionId(session.id);
+        setSelectedRoute(session.route ?? safeRouteFromUrl);
+        setMessages(toSceneMessages(savedPieces));
+        setStarted(savedPieces.length > 0);
       } catch (error) {
-        if (!mounted) return;
-        console.error("loadStoryAndSession error:", error);
+        console.error("load story session failed:", error);
+        if (!alive) return;
         setError(
           error instanceof Error
             ? error.message
-            : "장면을 불러오지 못했어요.",
+            : "저장된 장면을 불러오지 못했어요.",
         );
-      } finally {
-        if (mounted) setStoryLoading(false);
+        setSessionId(null);
+        setMessages([]);
+        setStarted(false);
       }
     }
 
-    void loadStoryAndSession();
+    void loadSession();
 
     return () => {
-      mounted = false;
+      alive = false;
     };
-  }, [params.id, urlRoute, urlSessionId, user]);
+  }, [safeRouteFromUrl, sessionIdParam, story, storyId, storyLoading, user]);
+
+  useEffect(() => {
+    // 배포 전 제거 가능: 클라이언트 라우팅 상태 꼬임 확인용 로그입니다.
+    console.log("story page state:", {
+      storyId,
+      sessionId: sessionIdParam,
+      routeParam,
+      authLoading,
+      hasUser: Boolean(user),
+      storyLoading,
+      hasStory: Boolean(story),
+      selectedRoute,
+      started,
+    });
+  }, [
+    authLoading,
+    routeParam,
+    selectedRoute,
+    sessionIdParam,
+    started,
+    story,
+    storyId,
+    storyLoading,
+    user,
+  ]);
 
   const routeConfig = useMemo(() => {
     if (!story) return null;
@@ -324,7 +406,8 @@ export default function StoryPlayPage() {
 
   const chooseRoute = (route: ProtagonistRoute) => {
     setSelectedRoute(route);
-    router.replace(`/stories/${params.id}?route=${route}`);
+    if (!storyId) return;
+    router.replace(`/stories/${storyId}?route=${route}`);
   };
 
   const startStory = async () => {
@@ -524,7 +607,7 @@ export default function StoryPlayPage() {
     }
   };
 
-  if (loading || (!loading && !user) || storyLoading) {
+  if (authLoading || (!authLoading && !user) || storyLoading || !storyId) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#151313] px-5 text-[#f6eee7]">
         <div className="rounded-2xl border border-white/10 bg-white/[0.055] px-6 py-5 text-sm text-[#e6d6ca]/80 backdrop-blur-xl">
@@ -540,7 +623,7 @@ export default function StoryPlayPage() {
         <section className="w-full max-w-md rounded-[30px] border border-white/10 bg-white/[0.065] p-7 text-center backdrop-blur-2xl">
           <p className="text-sm font-medium text-[#d2ad78]">오늘의 장면</p>
           <h1 className="mt-5 break-keep text-3xl font-semibold tracking-[-0.03em]">
-            없는 장면이에요.
+            {error || "열 수 없는 장면이에요."}
           </h1>
           <p className="mt-4 break-keep text-sm leading-7 text-[#e6d6ca]/75">
             공개되지 않았거나 잠시 닫혀 있는 이야기일 수 있어요.

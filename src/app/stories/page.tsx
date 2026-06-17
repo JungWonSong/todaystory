@@ -158,13 +158,12 @@ export default function StoriesPage() {
                     {story.description}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => router.push(`/stories/${story.id}`)}
-                  className="mt-8 rounded-full bg-[#c98a82] px-5 py-3 text-sm font-semibold text-[#1d1414] transition hover:bg-[#d99b92]"
+                <Link
+                  href={`/stories/${story.id}`}
+                  className="mt-8 rounded-full bg-[#c98a82] px-5 py-3 text-center text-sm font-semibold text-[#1d1414] transition hover:bg-[#d99b92]"
                 >
-                  시작하기
-                </button>
+                  장면 들어가기
+                </Link>
               </article>
             ))}
           </div>
