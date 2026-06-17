@@ -92,11 +92,7 @@ export default function StoriesPage() {
         <h1 className="max-w-3xl break-keep text-4xl font-semibold leading-tight tracking-[-0.04em] text-[#fff8f1] md:text-6xl">
           오늘은 어떤 장면으로 들어갈까요?
         </h1>
-        <p className="mt-6 max-w-xl break-keep text-base leading-8 text-[#e6d6ca]/76">
-          지금 마음에 가까운 이야기를 고르고, 첫 문장 뒤에 놓인 질문에
-          천천히 답해보세요.
-        </p>
-
+  
         {storiesLoading ? (
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((item) => (
