@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "오늘의 장면",
   description:
-    "읽는 이야기가 아니라, 내가 들어가는 장면. 주인공의 대사를 직접 쓰는 감정형 인터랙티브 소설 서비스.",
+    "읽기만 하던 이야기 속으로 들어가, 주인공의 한마디를 직접 써보는 감정형 스토리 서비스.",
 };
 
 export default function RootLayout({
@@ -15,9 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body className="bg-[#0f0c0c] text-[#fff7ea]">
         <AnalyticsTracker />
-        {children}
+        <div className="min-h-screen bg-[#0f0c0c] text-[#fff7ea]">
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );
