@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { goHomeWithReload } from "@/components/HomeLink";
 import { useAuth } from "@/hooks/useAuth";
 
 export function AuthNav() {
@@ -17,7 +18,7 @@ export function AuthNav() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/");
+    goHomeWithReload();
   };
 
   return (

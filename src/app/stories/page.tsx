@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { goHomeWithReload, HomeLink } from "@/components/HomeLink";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { getPublishedStories } from "@/lib/stories";
@@ -46,7 +47,7 @@ export default function StoriesPage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/");
+    goHomeWithReload();
   };
 
   if (loading || !user) {
@@ -57,9 +58,9 @@ export default function StoriesPage() {
     <main className="min-h-screen bg-[#151313] px-5 py-6 text-[#f6eee7] sm:px-8 lg:px-12">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_72%_12%,rgba(185,122,118,0.2),transparent_34%),linear-gradient(135deg,#151313,#211919_58%,#2f2020)]" />
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-        <Link href="/" className="text-lg font-semibold sm:text-xl">
+        <HomeLink className="text-lg font-semibold sm:text-xl">
           오늘의 장면
-        </Link>
+        </HomeLink>
         <div className="flex items-center gap-2">
           {isAdmin ? (
             <Link

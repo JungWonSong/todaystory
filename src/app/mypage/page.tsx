@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { goHomeWithReload, HomeLink } from "@/components/HomeLink";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -77,7 +78,7 @@ export default function MyPage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/");
+    goHomeWithReload();
   };
 
   const handleDelete = async (session: StorySession) => {
@@ -109,9 +110,9 @@ export default function MyPage() {
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_14%,rgba(185,122,118,0.2),transparent_34%),linear-gradient(135deg,#151313,#211919_58%,#2f2020)]" />
 
       <header className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-        <Link href="/" className="text-lg font-semibold sm:text-xl">
+        <HomeLink className="text-lg font-semibold sm:text-xl">
           오늘의 장면
-        </Link>
+        </HomeLink>
         <div className="flex items-center gap-2">
           <Link
             href="/stories"

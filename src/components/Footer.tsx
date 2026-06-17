@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HomeLink } from "@/components/HomeLink";
 
 const contactEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || "support@example.com";
 
@@ -15,12 +16,11 @@ export function Footer() {
     <footer className="border-t border-[#ead7bd]/10 bg-[#0f0c0c] px-5 py-10 text-[#f4e7d4]/70 sm:px-8 lg:px-12">
       <div className="mx-auto flex max-w-6xl flex-col gap-9 md:flex-row md:items-start md:justify-between">
         <div className="max-w-md">
-          <Link
-            href="/"
+          <HomeLink
             className="text-lg font-semibold tracking-[-0.02em] text-[#fff7ea] transition hover:text-[#d9978f]"
           >
             오늘의 장면
-          </Link>
+          </HomeLink>
           <p className="mt-4 break-keep text-sm leading-7">
             이야기 속 한 장면에 들어가, 다음 말을 직접 써보세요.
           </p>

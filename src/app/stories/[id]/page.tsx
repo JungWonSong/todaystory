@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import { HomeLink } from "@/components/HomeLink";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
 import { getStoryById } from "@/lib/stories";
@@ -656,9 +657,9 @@ export default function StoryPlayPage() {
           <Link href="/stories" className="text-sm text-[#d2ad78]">
             다른 이야기
           </Link>
-          <Link href="/" className="text-sm text-[#e6d6ca]/70">
+          <HomeLink className="text-sm text-[#e6d6ca]/70">
             오늘의 장면
-          </Link>
+          </HomeLink>
         </header>
 
         <section className="mx-auto max-w-[820px] py-12 md:py-20">
@@ -806,9 +807,9 @@ export default function StoryPlayPage() {
           >
             새 장면
           </button>
-          <Link href="/" className="text-sm text-[#e6d6ca]/70">
+          <HomeLink className="text-sm text-[#e6d6ca]/70">
             오늘의 장면
-          </Link>
+          </HomeLink>
         </div>
       </header>
 

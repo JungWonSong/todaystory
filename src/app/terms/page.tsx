@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { HomeLink } from "@/components/HomeLink";
 
 const terms = [
   "오늘의 장면은 사용자가 이야기 속 주인공이 되어 대사를 입력하고 장면을 이어가는 콘텐츠 서비스입니다.",
@@ -11,9 +11,9 @@ export default function TermsPage() {
   return (
     <main className="min-h-screen bg-[#151313] px-5 py-12 text-[#f6eee7] sm:px-8 lg:px-12">
       <section className="mx-auto max-w-3xl">
-        <Link href="/" className="text-sm text-[#d2ad78]">
+        <HomeLink className="text-sm text-[#d2ad78]">
           오늘의 장면
-        </Link>
+        </HomeLink>
 
         <p className="mt-12 text-sm font-medium text-[#d2ad78]">
           서비스 안내

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { AdminMetricsPanel } from "@/components/AdminMetricsPanel";
+import { HomeLink } from "@/components/HomeLink";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { hasSupabaseEnv } from "@/lib/supabase/client";
@@ -247,12 +248,11 @@ export default function AdminPage() {
           <p className="mt-4 break-keep text-sm leading-7 text-[#e6d6ca]/75">
             관리자 이메일로 로그인한 계정만 이야기 관리를 사용할 수 있어요.
           </p>
-          <Link
-            href="/"
+          <HomeLink
             className="mt-8 inline-flex rounded-full bg-[#c98a82] px-6 py-3 text-sm font-semibold text-[#1d1414]"
           >
             홈으로 돌아가기
-          </Link>
+          </HomeLink>
         </section>
       </main>
     );
@@ -262,9 +262,9 @@ export default function AdminPage() {
     <main className="min-h-screen bg-[#151313] px-5 py-6 text-[#f6eee7] sm:px-8 lg:px-12">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_14%,rgba(185,122,118,0.2),transparent_34%),linear-gradient(135deg,#151313,#211919_58%,#2f2020)]" />
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-3">
-        <Link href="/" className="text-lg font-semibold sm:text-xl">
+        <HomeLink className="text-lg font-semibold sm:text-xl">
           오늘의 장면
-        </Link>
+        </HomeLink>
         <div className="flex items-center gap-2">
           <Link href="/stories" className="rounded-full border border-[#f3d8bf]/20 bg-white/5 px-4 py-2 text-sm text-[#f6eee7] backdrop-blur-md transition hover:bg-white/10">
             이야기

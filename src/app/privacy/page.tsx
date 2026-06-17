@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { HomeLink } from "@/components/HomeLink";
 
 const privacyItems = [
   "회원가입 및 로그인 과정에서 이메일 또는 소셜 로그인 식별 정보를 처리할 수 있습니다.",
@@ -12,9 +12,9 @@ export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-[#151313] px-5 py-12 text-[#f6eee7] sm:px-8 lg:px-12">
       <section className="mx-auto max-w-3xl">
-        <Link href="/" className="text-sm text-[#d2ad78]">
+        <HomeLink className="text-sm text-[#d2ad78]">
           오늘의 장면
-        </Link>
+        </HomeLink>
 
         <p className="mt-12 text-sm font-medium text-[#d2ad78]">
           개인정보 안내

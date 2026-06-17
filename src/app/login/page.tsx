@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
+import { HomeLink } from "@/components/HomeLink";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { trackEvent } from "@/lib/analytics";
@@ -63,9 +64,9 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center overflow-hidden bg-[#151313] px-5 py-12 text-[#f6eee7]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_68%_18%,rgba(185,122,118,0.24),transparent_32%),radial-gradient(circle_at_20%_82%,rgba(210,173,120,0.14),transparent_34%),linear-gradient(135deg,#151313,#231b1b_54%,#321f20)]" />
       <section className="relative z-10 w-full max-w-md rounded-[30px] border border-white/10 bg-white/[0.065] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.42)] backdrop-blur-2xl sm:p-8">
-        <Link href="/" className="text-sm text-[#d2ad78]">
+        <HomeLink className="text-sm text-[#d2ad78]">
           오늘의 장면
-        </Link>
+        </HomeLink>
         <h1 className="mt-8 text-3xl font-semibold tracking-[-0.03em] text-[#fff8f1]">
           다시, 내 장면으로
         </h1>

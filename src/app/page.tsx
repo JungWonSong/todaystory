@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthNav } from "@/components/AuthNav";
 import { StartButton } from "@/components/StartButton";
 import { useAuth } from "@/hooks/useAuth";
@@ -110,12 +110,18 @@ function getStorySignal(story: LandingStory) {
 
 export default function Page() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const [stories, setStories] = useState<Story[]>([]);
   const [storiesLoading, setStoriesLoading] = useState(true);
+  const [landingError, setLandingError] = useState("");
 
   useEffect(() => {
     let mounted = true;
+
+    setStories([]);
+    setStoriesLoading(true);
+    setLandingError("");
 
     console.log("supabase env check:", {
       hasUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
@@ -128,7 +134,12 @@ export default function Page() {
       })
       .catch((error) => {
         console.error("landing stories load failed:", error);
-        if (mounted) setStories([]);
+        if (mounted) {
+          setStories([]);
+          setLandingError(
+            "이야기 목록을 잠시 불러오지 못했어요. 기본 장면을 먼저 보여드릴게요.",
+          );
+        }
       })
       .finally(() => {
         if (mounted) setStoriesLoading(false);
@@ -137,7 +148,7 @@ export default function Page() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [pathname]);
 
   const handleStoryStart = (story?: LandingStory) => {
     if (!user) {
@@ -482,61 +493,68 @@ export default function Page() {
               ))}
             </div>
           ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {visibleStories.map((story) => {
-                const signal = getStorySignal(story);
+            <>
+              {landingError ? (
+                <p className="mb-5 rounded-2xl border border-[#d2ad78]/20 bg-[#d2ad78]/10 px-4 py-3 text-sm text-[#f4e1c0]">
+                  {landingError}
+                </p>
+              ) : null}
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {visibleStories.map((story) => {
+                  const signal = getStorySignal(story);
 
-                return (
-                  <article
-                    key={story.id || story.title}
-                    className="group flex min-h-[300px] flex-col justify-between rounded-2xl border border-white/10 bg-white/[0.055] p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-[#c98a82]/45 hover:bg-white/[0.085]"
-                  >
-                    <div>
-                      <div className="mb-7 flex items-center justify-between gap-4">
-                        {story.cover_image_url ? (
-                          <div
-                            className="h-14 w-14 rounded-2xl bg-cover bg-center"
-                            style={{
-                              backgroundImage: `url(${story.cover_image_url})`,
-                            }}
-                          />
-                        ) : (
-                          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d2ad78]/12 text-3xl">
-                            {story.cover_emoji || "✦"}
-                          </span>
-                        )}
-                        <span className="rounded-full bg-[#d2ad78]/12 px-3 py-1 text-xs text-[#d2ad78]">
-                          {story.category || "이야기"}
-                        </span>
-                      </div>
-                      <h3 className="break-keep text-2xl font-semibold tracking-[-0.02em] text-[#fff8f1]">
-                        {story.title}
-                      </h3>
-                      {story.subtitle ? (
-                        <p className="mt-3 break-keep text-sm leading-6 text-[#f0dfd1]/82">
-                          {story.subtitle}
-                        </p>
-                      ) : null}
-                      <p className="mt-4 break-keep text-sm leading-7 text-[#e6d6ca]/76">
-                        {story.description}
-                      </p>
-                      {signal ? (
-                        <p className="mt-5 break-keep rounded-2xl border border-[#f4d6bd]/12 bg-[#151313]/40 px-4 py-4 text-sm leading-7 text-[#fff8f1]/86">
-                          {signal}
-                        </p>
-                      ) : null}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleStoryStart(story)}
-                      className="mt-8 rounded-full border border-[#c98a82]/30 px-5 py-3 text-sm font-semibold text-[#f3c4bf] transition hover:bg-[#c98a82]/10"
+                  return (
+                    <article
+                      key={story.id || story.title}
+                      className="group flex min-h-[300px] flex-col justify-between rounded-2xl border border-white/10 bg-white/[0.055] p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-[#c98a82]/45 hover:bg-white/[0.085]"
                     >
-                      장면 들어가기
-                    </button>
-                  </article>
-                );
-              })}
-            </div>
+                      <div>
+                        <div className="mb-7 flex items-center justify-between gap-4">
+                          {story.cover_image_url ? (
+                            <div
+                              className="h-14 w-14 rounded-2xl bg-cover bg-center"
+                              style={{
+                                backgroundImage: `url(${story.cover_image_url})`,
+                              }}
+                            />
+                          ) : (
+                            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#d2ad78]/12 text-3xl">
+                              {story.cover_emoji || "✦"}
+                            </span>
+                          )}
+                          <span className="rounded-full bg-[#d2ad78]/12 px-3 py-1 text-xs text-[#d2ad78]">
+                            {story.category || "이야기"}
+                          </span>
+                        </div>
+                        <h3 className="break-keep text-2xl font-semibold tracking-[-0.02em] text-[#fff8f1]">
+                          {story.title}
+                        </h3>
+                        {story.subtitle ? (
+                          <p className="mt-3 break-keep text-sm leading-6 text-[#f0dfd1]/82">
+                            {story.subtitle}
+                          </p>
+                        ) : null}
+                        <p className="mt-4 break-keep text-sm leading-7 text-[#e6d6ca]/76">
+                          {story.description}
+                        </p>
+                        {signal ? (
+                          <p className="mt-5 break-keep rounded-2xl border border-[#f4d6bd]/12 bg-[#151313]/40 px-4 py-4 text-sm leading-7 text-[#fff8f1]/86">
+                            {signal}
+                          </p>
+                        ) : null}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleStoryStart(story)}
+                        className="mt-8 rounded-full border border-[#c98a82]/30 px-5 py-3 text-sm font-semibold text-[#f3c4bf] transition hover:bg-[#c98a82]/10"
+                      >
+                        장면 들어가기
+                      </button>
+                    </article>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </section>
