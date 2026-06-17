@@ -1,14 +1,35 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-const safeSupabaseUrl = supabaseUrl?.trim() || "https://example.supabase.co";
-const safeSupabaseAnonKey =
-  supabaseAnonKey?.trim() || "missing-supabase-anon-key";
 
 export const hasSupabaseEnv = Boolean(
   supabaseUrl?.trim() && supabaseAnonKey?.trim(),
 );
 
-export const supabase = createClient(safeSupabaseUrl, safeSupabaseAnonKey);
+let supabaseInstance: SupabaseClient | null = null;
+
+export function getSupabaseClient() {
+  const url = supabaseUrl?.trim();
+  const anonKey = supabaseAnonKey?.trim();
+
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL is missing");
+  }
+
+  if (!anonKey) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_ANON_KEY is missing");
+  }
+
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(url, anonKey);
+  }
+
+  return supabaseInstance;
+}
+
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, property, receiver) {
+    return Reflect.get(getSupabaseClient(), property, receiver);
+  },
+});

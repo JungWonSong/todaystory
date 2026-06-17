@@ -64,20 +64,31 @@ function validateStoryInput(input: StoryFormInput) {
 }
 
 export async function getLandingStories() {
-  const { data, error } = await supabase
-    .from("stories")
-    .select("*")
-    .eq("status", "published")
-    .eq("is_active", true)
-    .eq("show_on_landing", true)
-    .order("display_order", { ascending: true })
-    .order("created_at", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("stories")
+      .select("*")
+      .eq("status", "published")
+      .eq("is_active", true)
+      .eq("show_on_landing", true)
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    throw new Error("랜딩 이야기 목록을 불러오지 못했어요.");
+    if (error) {
+      console.error("getLandingStories error:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+      throw new Error(error.message);
+    }
+
+    return (data ?? []) as Story[];
+  } catch (error) {
+    console.error("getLandingStories error:", error);
+    throw error;
   }
-
-  return (data ?? []) as Story[];
 }
 
 export async function getPublishedStories() {

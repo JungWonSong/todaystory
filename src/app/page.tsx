@@ -117,11 +117,17 @@ export default function Page() {
   useEffect(() => {
     let mounted = true;
 
+    console.log("supabase env check:", {
+      hasUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+      hasAnonKey: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    });
+
     getLandingStories()
       .then((data) => {
         if (mounted) setStories(data);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("landing stories load failed:", error);
         if (mounted) setStories([]);
       })
       .finally(() => {
