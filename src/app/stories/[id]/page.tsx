@@ -27,9 +27,9 @@ const defaultPlace = "조용한 장면 안";
 const defaultTime = "어느 하루의 끝";
 
 const suggestionButtons = [
-  { label: "조심스럽게 말한다", value: "그 말이 조금 서운했어." },
-  { label: "솔직하게 말한다", value: "나도 오늘 많이 힘들었어." },
-  { label: "아무 말도 하지 못한다", value: "...아무 말도 할 수 없었다." },
+  { label: "조심스럽게", value: "그 말이 조금 서운했어." },
+  { label: "솔직하게", value: "나도 오늘 많이 힘들었어." },
+  { label: "침묵하기", value: "...아무 말도 할 수 없었다." },
 ];
 
 function isRoute(value: string | null): value is ProtagonistRoute {
@@ -700,19 +700,36 @@ export default function StoryPlayPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#151313] px-5 pb-[310px] pt-6 text-[#f6eee7] sm:px-8 lg:px-12">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#151313] px-5 pt-6 text-[#f6eee7] sm:px-8 lg:px-12">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_70%_14%,rgba(185,122,118,0.18),transparent_34%),linear-gradient(135deg,#151313,#211919_58%,#2f2020)]" />
 
       <header className="mx-auto flex max-w-[760px] items-center justify-between gap-4">
         <Link href="/stories" className="text-sm text-[#d2ad78]">
           뒤로가기
         </Link>
-        <Link href="/" className="text-sm text-[#e6d6ca]/70">
-          오늘의 장면
-        </Link>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => {
+              setStarted(false);
+              setSessionId(null);
+              setMessages([]);
+              setInput("");
+              setError("");
+              setSaveError("");
+              router.replace(`/stories/${story.id}`);
+            }}
+            className="text-xs text-[#f4e7d4]/45 transition hover:text-[#f4e7d4]"
+          >
+            새 장면
+          </button>
+          <Link href="/" className="text-sm text-[#e6d6ca]/70">
+            오늘의 장면
+          </Link>
+        </div>
       </header>
 
-      <section className="mx-auto max-w-[760px] py-10">
+      <section className="mx-auto max-w-[760px] pb-8 pt-10">
         {error ? (
           <p className="mb-5 rounded-2xl border border-[#c98a82]/25 bg-[#c98a82]/10 px-4 py-3 text-sm text-[#f3c4bf]">
             {error}
@@ -763,7 +780,7 @@ export default function StoryPlayPage() {
             </p>
           </div>
 
-          <div className="space-y-9">
+          <div className="space-y-8 pb-28 sm:pb-20">
             {messages.map((message, index) => (
               <StoryPiece key={`${message.role}-${index}`} message={message} />
             ))}
@@ -782,63 +799,45 @@ export default function StoryPlayPage() {
         </article>
       </section>
 
-      <section className="fixed inset-x-0 bottom-0 border-t border-white/10 bg-[#151313]/92 px-5 py-4 backdrop-blur-2xl sm:px-8">
-        <div className="mx-auto max-w-[760px]">
-          <p className="mb-3 break-keep text-sm font-medium text-[#efe2d8]">
-            주인공인 당신의 대사를 적어주세요.
-          </p>
-          <div className="mb-3 flex flex-wrap gap-2">
+      <section className="fixed inset-x-0 bottom-0 z-20 border-t border-[#ead7bd]/10 bg-[#120f0f]/90 px-5 py-3 backdrop-blur-xl sm:bottom-4 sm:left-1/2 sm:right-auto sm:w-full sm:max-w-[760px] sm:-translate-x-1/2 sm:rounded-3xl sm:border sm:px-5">
+        <div>
+          <p className="text-sm font-medium text-[#f4e7d4]/80">내 대사</p>
+
+          <div className="mt-2 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {suggestionButtons.map((suggestion) => (
               <button
                 key={suggestion.label}
                 type="button"
                 disabled={submitting}
                 onClick={() => setInput(suggestion.value)}
-                className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-2 text-xs text-[#e6d6ca]/80 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                className="shrink-0 rounded-full border border-[#ead7bd]/15 bg-white/5 px-3 py-1.5 text-xs text-[#f4e7d4]/80 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {suggestion.label}
               </button>
             ))}
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#211b1a] p-3">
-            <textarea
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={submitting}
-              maxLength={300}
-              placeholder="이 장면에서 하고 싶은 말을 적어보세요."
-              className="min-h-[96px] w-full resize-none bg-transparent px-2 py-2 text-sm leading-7 text-[#fff8f1] outline-none placeholder:text-[#e6d6ca]/35 disabled:opacity-60"
-            />
-            <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
-              <p className="text-xs text-[#e6d6ca]/45">{input.length}/300</p>
-              <button
-                type="button"
-                onClick={() => void submitInput()}
-                disabled={submitting}
-                className="rounded-full bg-[#c98a82] px-5 py-3 text-sm font-semibold text-[#1d1414] transition hover:bg-[#d99b92] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                대사 넣기
-              </button>
-            </div>
-          </div>
+          <textarea
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={submitting}
+            maxLength={300}
+            placeholder="이 장면에서 할 말을 적어보세요."
+            className="min-h-[72px] max-h-[120px] w-full resize-none rounded-2xl border border-[#ead7bd]/10 bg-[#1d1717]/90 px-4 py-3 text-[15px] leading-relaxed text-[#fff7ea] outline-none transition placeholder:text-[#f4e7d4]/35 focus:border-[#d9978f]/50 disabled:opacity-60"
+          />
 
-          <button
-            type="button"
-            onClick={() => {
-              setStarted(false);
-              setSessionId(null);
-              setMessages([]);
-              setInput("");
-              setError("");
-              setSaveError("");
-              router.replace(`/stories/${story.id}`);
-            }}
-            className="mt-3 text-xs text-[#e6d6ca]/50 transition hover:text-[#e6d6ca]"
-          >
-            새 장면으로 시작하기
-          </button>
+          <div className="mt-2 flex items-center justify-between">
+            <p className="text-xs text-[#e6d6ca]/45">{input.length}/300</p>
+            <button
+              type="button"
+              onClick={() => void submitInput()}
+              disabled={submitting}
+              className="rounded-full bg-[#c98a82] px-5 py-2 text-sm font-semibold text-[#1d1414] transition hover:bg-[#d99b92] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              대사 넣기
+            </button>
+          </div>
         </div>
       </section>
     </main>
